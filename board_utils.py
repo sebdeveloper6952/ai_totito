@@ -38,3 +38,24 @@ def calculate_scores(board):
         elif board[1][a] < 0:
             p2_score += abs(board[1][a])
     return p1_score, p2_score
+
+def get_minimax_scores(board):
+    p1_score, p2_score = 0, 0
+    for a in range(len(board[0])):
+        if board[0][a] > 0:
+            p1_score += board[0][a]
+        elif board[0][a] < 0:
+            p2_score += board[0][a]
+        if board[1][a] > 0:
+            p1_score += board[1][a]
+        elif board[1][a] < 0:
+            p2_score += board[1][a]
+    return p1_score, p2_score
+
+def is_full(board):
+    # returns number of winner or -1 for no winner
+    for i in board:
+        for j in board:
+            if j == 0:
+                return False
+    return True
