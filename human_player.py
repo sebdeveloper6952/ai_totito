@@ -96,6 +96,10 @@ def ready(data):
         print(row)
     h_or_v = int(input("H(0) or V(1): "))
     pos = int(input("Pos: "))
+
+    squares = new_squares_created(curr_board, [h_or_v, pos])
+    print(f"Squares created in this move: {squares}")
+
     play_move(h_or_v, pos, data["player_turn_id"])
 
 # Main Program
