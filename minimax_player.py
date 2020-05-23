@@ -7,9 +7,11 @@ from math import inf
 # data
 username = input("Username: ")
 tid = input("Tournament ID: ")
+# url = "http://3.12.129.126:4000"
 url = "http://localhost:4000"
 game_id = 0
 curr_board = []
+counter = 0
 
 # global client
 client = socketio.Client()
@@ -61,8 +63,7 @@ def finish(data):
 
 @client.event
 def ready(data):
-    os.system('clear')
-    time.sleep(0.1)
+    # os.system('clear')
 
     global game_id
     global curr_board
@@ -82,20 +83,28 @@ def ready(data):
     # apply best_move to board
     # play_move(best_move)
 
-    valid_moves = get_valid_moves(curr_board)
-    print(valid_moves)
-    best_score = -inf
-    best_move = []
-    is_max = not data["player_turn_id"] == 1
-    for i in range(2):
-        for j in range(len(valid_moves[i])):
-            curr_board[i][valid_moves[i][j]] = 0
-            score = minimax(curr_board, 0, is_max)
-            curr_board[i][valid_moves[i][j]] = 99
-            if score > best_score:
-                best_score = score
-                best_move = [i, valid_moves[i][j]]
-    print(f"Playing move {best_move}")
+    is_max = data["player_turn_id"] == 1
+    # print(f"is MAX turn? {is_max}")
+
+    # valid_moves = get_valid_moves(curr_board)
+    # print(valid_moves)
+    # best_score = -inf
+    best_move = [0,0]
+
+    global counter
+    counter = 0
+
+    start = time.time()
+    
+    best_score = minimax(curr_board, 3, is_max, best_move)
+    
+    print(f"Time to compute next move: {time.time() - start}")
+    print(f"Considered {counter} positions.")
+    # print the current board, before sending this move
+    print_board(curr_board)
+    
+    print(f"Playing move {best_move}, with score {best_score}")
+    # input("press to play move...")
     play_move(best_move[0], best_move[1], data["player_turn_id"])
     
 
@@ -111,29 +120,43 @@ def play_move(h_or_v, pos, player_turn_id):
         'movement': [h_or_v, pos]
     })
 
-def minimax(position, depth, is_max):
-    # get number of winner
-    if is_full(position):
-        p1, p2 = calculate_scores(position)
-        return p1 if p1 > p2 else p2
-    valid_moves = get_valid_moves(position)
+def minimax(board, depth, is_max, best_move):
+    # TODO: remove for final
+    # print(f"is_max: {is_max}, @ depth: {depth}, eval board: {board}")
+    # input("step...")
+    global counter
+    counter += 1
+
+    if is_full(board) or depth == 0:
+        e = static_evaluation(board)
+        # print(f"Reached depth 0! Static evaluation: {e}")
+        return e
+    valid_moves = get_valid_moves(board)
     if is_max:
         best_score = -inf
-        for i in valid_moves:
-            for j in range(len(curr_board[i])):
-                if position[i][valid_moves[i][j]] == '':
-                    curr_board[i][valid_moves[i][j]] = 0
-                    score = minimax(curr_board, depth + 1, False)
-                    curr_board[i][valid_moves[i][j]] = 99
-                    best_score = max(score, best_score)
+        for i in range(2):
+            for j in valid_moves[i]:
+                if board[i][j] == EMPTY: # TODO: check if this if can be removed
+                    sq = new_squares_created(board, [i, j])
+                    board[i][j] = sq if sq > 0 else 0
+                    score = minimax(board, depth - 1, False, best_move)
+                    board[i][j] = EMPTY
+                    if score > best_score:
+                        best_score = score
+                        best_move[0] = i
+                        best_move[1] = j
         return best_score
     else:
         best_score = inf
-        for i in valid_moves:
-            for j in range(len(curr_board[i])):
-                if position[i][valid_moves[i][j]] == '':
-                    curr_board[i][valid_moves[i][j]] = 0
-                    score = minimax(curr_board, depth + 1, True)
-                    curr_board[i][valid_moves[i][j]] = 99
-                    best_score = min(score, best_score)
+        for i in range(2):
+            for j in valid_moves[i]:
+                if board[i][j] == EMPTY: # TODO: check if this if can be removed
+                    sq = new_squares_created(board, [i, j])
+                    board[i][j] = sq if sq > 0 else 0
+                    score = minimax(board, depth - 1, True, best_move)
+                    board[i][j] = EMPTY
+                    if score < best_score:
+                        best_score = score
+                        best_move[0] = i
+                        best_move[1] = j
         return best_score

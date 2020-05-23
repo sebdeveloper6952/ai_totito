@@ -20,45 +20,41 @@ def print_board(board):
         print("")
 
 def get_valid_moves(board):
+    # returns valid moves on board
     valid_moves = [[],[]]
+    # valid_moves = []
     for a in range(len(board[0])):
         if board[0][a] == EMPTY:
             valid_moves[0].append(a)
+            # valid_moves.append([0, a])
         if board[1][a] == EMPTY:
             valid_moves[1].append(a)
+            # valid_moves.append([1, a])
     return valid_moves
 
 def calculate_scores(board):
+    # return p1_score, p2_score
     p1_score, p2_score = 0, 0
     for a in range(len(board[0])):
-        if board[0][a] > 0:
-            p1_score += board[0][a]
-        elif board[0][a] < 0:
-            p2_score += abs(board[0][a])
-        if board[1][a] > 0:
-            p1_score += board[1][a]
-        elif board[1][a] < 0:
-            p2_score += abs(board[1][a])
-    return p1_score, p2_score
-
-def get_minimax_scores(board):
-    p1_score, p2_score = 0, 0
-    for a in range(len(board[0])):
-        if board[0][a] > 0:
-            p1_score += board[0][a]
-        elif board[0][a] < 0:
-            p2_score += board[0][a]
-        if board[1][a] > 0:
-            p1_score += board[1][a]
-        elif board[1][a] < 0:
-            p2_score += board[1][a]
+        h = board[0][a]
+        v = board[1][a]
+        if h is not EMPTY:
+            if h > 0:
+                p1_score += h
+            else:
+                p2_score += abs(h)
+        if v is not EMPTY:
+            if v > 0:
+                p1_score += v
+            else:
+                p2_score += abs(v)
     return p1_score, p2_score
 
 def is_full(board):
-    # returns number of winner or -1 for no winner
+    # returns whether the board is full
     for i in board:
-        for j in board:
-            if j == 0:
+        for j in i:
+            if j == EMPTY:
                 return False
     return True
 
@@ -79,10 +75,20 @@ def count_squares(board):
     return square_count
 
 def new_squares_created(board, move):
-    # returns number of new squares created
+    # returns number of new squares created with move
     b = count_squares(board)
     # apply move
     board[move[0]][move[1]] = 0
     a = count_squares(board)
     board[move[0]][move[1]] = EMPTY
     return a - b
+
+def static_evaluation(board):
+    """
+    Returns one number associated with this board:
+    p1_score - p2_score. If possitive, this board
+    is beneficial for MAX player and if negative,
+    this board is better for MIN player
+    """
+    p1_score, p2_score = calculate_scores(board)
+    return (p1_score - p2_score)

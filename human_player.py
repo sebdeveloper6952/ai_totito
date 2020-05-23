@@ -19,7 +19,6 @@ player_num = 0
 client = socketio.Client()
 
 # temp
-prev_board = []
 curr_board = []
 
 # sign in to the server using constants above

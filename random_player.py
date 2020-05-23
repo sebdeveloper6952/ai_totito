@@ -6,20 +6,20 @@ import os
 import time
 
 # SEED
-seed(int(time.time()))
+# seed(int(time.time()))
+seed(69)
 
 # data
 username = input("Username: ")
 tid = input("Tournament ID: ")
+# url = "http://3.12.129.126:4000"
 url = "http://localhost:4000"
 game_id = 0
-player_num = 0
 
 # global client
 client = socketio.Client()
 
 # temp
-prev_board = []
 curr_board = []
 
 # sign in to the server using constants above
@@ -71,7 +71,6 @@ def finish(data):
 def ready(data):
     os.system('clear')
 
-    global player_num
     global game_id
     global curr_board
 
@@ -92,7 +91,7 @@ def ready(data):
     print("")
 
     # TODO: remove for online testing
-    time.sleep(0.1)
+    # time.sleep(0.1)
 
     # random valid move
     h_or_v, pos = 0, 0
@@ -118,7 +117,7 @@ client.connect(url)
 
 ####################################### Dots And Boxes ###############################################
 def play_move(h_or_v, pos, player_turn_id):
-    print(f"Player {player_num} is sending move [{h_or_v},{pos}]")
+    print(f"Player {player_turn_id} is sending move [{h_or_v},{pos}]")
     client.emit('play', {
         'tournament_id': tid,
         'game_id': game_id,
