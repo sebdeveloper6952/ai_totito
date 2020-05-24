@@ -1,6 +1,7 @@
 import socketio
 from random import seed
 from random import randint
+from random import choice
 from board_utils import *
 import os
 import time
@@ -84,26 +85,23 @@ def ready(data):
 
     # valid moves
     valid_moves = get_valid_moves(curr_board)
-    print("")
-    print("Valid moves: ")
-    print(valid_moves[0])
-    print(valid_moves[1])
-    print("")
+    move = choice(valid_moves)
 
     # TODO: remove for online testing
-    # time.sleep(0.1)
+    # time.sleep(0.5)
 
     # random valid move
-    h_or_v, pos = 0, 0
-    if len(valid_moves[0]) > 0 and len(valid_moves[1]) > 0:
-        h_or_v = randint(0,1)
-        pos = randint(0, len(valid_moves[h_or_v]) - 1)
-    elif len(valid_moves[0]) == 0:
-        h_or_v = 1
-        pos = randint(0, len(valid_moves[1]) - 1)
-    else:
-        pos = randint(0, len(valid_moves[0]) - 1)
-    play_move(h_or_v, valid_moves[h_or_v][pos], data["player_turn_id"])
+    # h_or_v, pos = 0, 0
+    # if len(valid_moves[0]) > 0 and len(valid_moves[1]) > 0:
+    #     h_or_v = randint(0,1)
+    #     pos = randint(0, len(valid_moves[h_or_v]) - 1)
+    # elif len(valid_moves[0]) == 0:
+    #     h_or_v = 1
+    #     pos = randint(0, len(valid_moves[1]) - 1)
+    # else:
+    #     pos = randint(0, len(valid_moves[0]) - 1)
+    # play_move(h_or_v, valid_moves[h_or_v][pos], data["player_turn_id"])
+    play_move(move, data["player_turn_id"])
     
     # player input
     # for row in curr_board:
@@ -116,11 +114,11 @@ def ready(data):
 client.connect(url)
 
 ####################################### Dots And Boxes ###############################################
-def play_move(h_or_v, pos, player_turn_id):
-    print(f"Player {player_turn_id} is sending move [{h_or_v},{pos}]")
+def play_move(move, player_turn_id):
+    print(f"Player {player_turn_id} is sending move [{move[0]},{move[1]}]")
     client.emit('play', {
         'tournament_id': tid,
         'game_id': game_id,
         'player_turn_id': player_turn_id,
-        'movement': [h_or_v, pos]
+        'movement': move
     })
