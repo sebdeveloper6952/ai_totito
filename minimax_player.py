@@ -95,9 +95,7 @@ def ready(data):
     counter = 0
 
     start = time.time()
-    
-    best_score = minimax(curr_board, 3, is_max, best_move)
-    
+    best_score = minimax(curr_board, 60, is_max, -inf, inf, best_move)
     print(f"Time to compute next move: {time.time() - start}")
     print(f"Considered {counter} positions.")
     # print the current board, before sending this move
@@ -120,43 +118,44 @@ def play_move(h_or_v, pos, player_turn_id):
         'movement': [h_or_v, pos]
     })
 
-def minimax(board, depth, is_max, best_move):
+def minimax(board, depth, is_max, a, b, best_move):
     # TODO: remove for final
     # print(f"is_max: {is_max}, @ depth: {depth}, eval board: {board}")
     # input("step...")
     global counter
     counter += 1
 
-    if is_full(board) or depth == 0:
-        e = static_evaluation(board)
-        # print(f"Reached depth 0! Static evaluation: {e}")
-        return e
+    if depth == 0 or is_full(board):
+        return static_evaluation(board)
+
     valid_moves = get_valid_moves(board)
     if is_max:
         best_score = -inf
-        for i in range(2):
-            for j in valid_moves[i]:
-                if board[i][j] == EMPTY: # TODO: check if this if can be removed
-                    sq = new_squares_created(board, [i, j])
-                    board[i][j] = sq if sq > 0 else 0
-                    score = minimax(board, depth - 1, False, best_move)
-                    board[i][j] = EMPTY
-                    if score > best_score:
-                        best_score = score
-                        best_move[0] = i
-                        best_move[1] = j
+        for m in valid_moves:
+            sq = new_squares_created(board, [m[0], m[1]])
+            board[m[0]][m[1]] = sq if sq > 0 else 0
+            score = minimax(board, depth - 1, False, a, b, best_move)
+            board[m[0]][m[1]] = EMPTY
+            a = max(a, score)
+            if b <= a:
+                break
+            if score > best_score:
+                best_score = score
+                best_move[0] = m[0]
+                best_move[1] = m[1]
         return best_score
     else:
         best_score = inf
-        for i in range(2):
-            for j in valid_moves[i]:
-                if board[i][j] == EMPTY: # TODO: check if this if can be removed
-                    sq = new_squares_created(board, [i, j])
-                    board[i][j] = sq if sq > 0 else 0
-                    score = minimax(board, depth - 1, True, best_move)
-                    board[i][j] = EMPTY
-                    if score < best_score:
-                        best_score = score
-                        best_move[0] = i
-                        best_move[1] = j
+        for m in valid_moves:
+            sq = new_squares_created(board, [m[0], m[1]])
+            board[m[0]][m[1]] = sq if sq > 0 else 0
+            score = minimax(board, depth - 1, True, a, b, best_move)
+            board[m[0]][m[1]] = EMPTY
+            b = min(b, score)
+            if b <= a:
+                break
+            if score < best_score:
+                best_score = score
+                best_move[0] = m[0]
+                best_move[1] = m[1]
         return best_score
