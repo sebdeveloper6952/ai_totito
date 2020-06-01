@@ -15,7 +15,8 @@ tid = 1
 url = "http://localhost:4000"
 game_id = 0
 curr_board = []
-starting_depth = 2
+# starting_depth = int(input("Lookahead: "))
+starting_depth = 3
 algo_depth = starting_depth
 
 # global client
@@ -75,8 +76,17 @@ def ready(data):
     game_id = data["game_id"]
 
     start = time.time()
+    moves_left = len(get_valid_moves(curr_board))
     (best_score, best_move) = minimax(curr_board, algo_depth, True, -inf, inf)
     diff = time.time() - start
+
+    if algo_depth < 7 and moves_left < 25 and diff < 0.1:
+        algo_depth += 1
+
+    if diff > 1.0:
+        print("******************************************************")
+        print(f"Diff was: {diff}, moves left: {moves_left}, depth: {algo_depth}")
+        print("******************************************************")
     
     print(f"Time: {diff}, Depth: {algo_depth}")
     print(f"Playing move {best_move}, with score {best_score}")
