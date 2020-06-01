@@ -9,8 +9,10 @@ import time
 seed(int(time.time()))
 
 # data
-username = input("Username: ")
-tid = input("Tournament ID: ")
+# username = input("Username: ")
+username = "sebas"
+tid = 1
+# tid = input("Tournament ID: ")
 url = "http://localhost:4000"
 game_id = 0
 player_num = 0
@@ -68,8 +70,6 @@ def finish(data):
 
 @client.event
 def ready(data):
-    os.system('clear')
-
     global player_num
     global game_id
     global curr_board
@@ -86,8 +86,7 @@ def ready(data):
     valid_moves = get_valid_moves(curr_board)
     print("")
     print("Valid moves: ")
-    print(valid_moves[0])
-    print(valid_moves[1])
+    print(valid_moves)
     print("")
     
     # player input
@@ -95,6 +94,16 @@ def ready(data):
         print(row)
     h_or_v = int(input("H(0) or V(1): "))
     pos = int(input("Pos: "))
+
+    while curr_board[h_or_v][pos] is not EMPTY:
+        print("Wrong move, choose again...")
+        # valid moves
+        valid_moves = get_valid_moves(curr_board)
+        print("Valid moves are:")
+        print(valid_moves)
+        print("")
+        h_or_v = int(input("H(0) or V(1): "))
+        pos = int(input("Pos: "))
 
     squares = new_squares_created(curr_board, [h_or_v, pos])
     print(f"Squares created in this move: {squares}")

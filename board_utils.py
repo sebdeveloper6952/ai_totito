@@ -21,34 +21,30 @@ def print_board(board):
 
 def get_valid_moves(board):
     # returns valid moves on board
-    # valid_moves = [[],[]]
     valid_moves = []
     for a in range(len(board[0])):
         if board[0][a] == EMPTY:
-            # valid_moves[0].append(a)
             valid_moves.append([0, a])
         if board[1][a] == EMPTY:
-            # valid_moves[1].append(a)
             valid_moves.append([1, a])
     return valid_moves
 
 def calculate_scores(board):
-    # return p1_score, p2_score
     p1_score, p2_score = 0, 0
     for a in range(len(board[0])):
         h = board[0][a]
         v = board[1][a]
-        if h is not EMPTY:
+        if h is not EMPTY and h is not 0:
             if h > 0:
                 p1_score += h
             else:
-                p2_score += abs(h)
-        if v is not EMPTY:
+                p2_score += h
+        if v is not EMPTY and v is not 0:
             if v > 0:
                 p1_score += v
             else:
-                p2_score += abs(v)
-    return p1_score, p2_score
+                p2_score += v
+    return p1_score, abs(p2_score)
 
 def is_full(board):
     # returns whether the board is full
